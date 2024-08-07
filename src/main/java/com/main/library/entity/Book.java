@@ -7,6 +7,8 @@ import java.util.Objects;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.main.library.annotation.YearBeforeCurrentYear;
 
 import jakarta.persistence.Column;
@@ -38,6 +40,8 @@ public class Book {
 	private String isbn;
 
 	@OneToMany(mappedBy = "book")
+//	@JsonIgnoreProperties(value = {"book"})
+	@JsonIgnore
 	private List<BorrowingRecord> borrowingRecords = new ArrayList<>();
 
 	public Long getId() {

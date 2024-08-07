@@ -12,4 +12,5 @@ public interface BookService {
 	void deleteById(Long id);
 	Book updateBook(Book book);
 	Book save(Book book);
+	Book findByIsbn(String isbn);
 }

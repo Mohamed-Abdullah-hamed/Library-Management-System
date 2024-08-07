@@ -1,6 +1,5 @@
 package com.main.library.rest;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.main.library.entity.Book;
-import com.main.library.entity.BorrowingRecord;
+import com.main.library.exception.CustomException;
 import com.main.library.service.BookService;
-import com.main.library.service.BorrowingRecordService;
 
 import jakarta.validation.Valid;
 
@@ -28,8 +26,6 @@ import jakarta.validation.Valid;
 public class BookRestController {
 	@Autowired
 	private BookService bookService;
-	@Autowired
-	private BorrowingRecordService recordService;
 
 	@GetMapping("{id}")
 	public ResponseEntity<Book> findById(@PathVariable Long id) {
@@ -52,25 +48,25 @@ public class BookRestController {
 	public ResponseEntity<?> deleteById(@PathVariable Long id) {
 		Optional<Book> book = bookService.findById(id);
 		if (book.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			throw new CustomException("this Book is not found");
 		}
-		List<BorrowingRecord> records = recordService.findByBookId(id);
-		if (records.size() > 0 && records.get(0).getReturnDate() != null
-				&& records.get(0).getReturnDate().isAfter(LocalDate.now())) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-		}
+
 		bookService.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("{id}")
 	public ResponseEntity<Book> updateBook(@RequestBody @Valid Book book, @PathVariable Long id) {
-		if (id == null || id.equals(0)) {
+		if (id == null || id == 0) {
 			return ResponseEntity.badRequest().build();
 		}
 		Optional<Book> b = bookService.findById(id);
-		if(b.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+		if (b.isEmpty()) {
+			throw new CustomException("this Book is not found");
+		}
+		Book b2 = bookService.findByIsbn(book.getIsbn());
+		if(b2 != null && !id.equals(b2.getId())) {
+			throw new CustomException("Duplicate Isbn -> this Isbn is inserted before ");
 		}
 		book.setId(id);
 		Book updatedBook = bookService.updateBook(book);
@@ -81,6 +77,10 @@ public class BookRestController {
 	public ResponseEntity<Book> save(@RequestBody @Valid Book book) {
 		if (book.getId() != null) {
 			return ResponseEntity.badRequest().build();
+		}
+		Book b = bookService.findByIsbn(book.getIsbn());
+		if(b != null) {
+			throw new CustomException("Duplicate Isbn -> this Isbn is inserted before ");
 		}
 		Book savedBook = bookService.save(book);
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);

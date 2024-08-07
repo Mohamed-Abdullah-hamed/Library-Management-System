@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.hibernate.validator.constraints.Length;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.main.library.annotation.ValidIdentityNumber;
 import com.main.library.annotation.ValidMobileNumber;
 import jakarta.persistence.Column;
@@ -32,6 +35,8 @@ public class Patron {
 	private String identityNumber;
 	
 	@OneToMany(mappedBy = "patron")
+//	@JsonIgnoreProperties(value = {"patron"})
+	@JsonIgnore
 	private List<BorrowingRecord> borrowingRecords = new ArrayList<>();
 
 	public Long getId() {

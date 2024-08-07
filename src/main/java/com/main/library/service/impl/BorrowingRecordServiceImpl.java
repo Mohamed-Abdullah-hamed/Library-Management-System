@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.main.library.entity.BorrowingRecord;
-import com.main.library.entity.BorrowingRecordId;
 import com.main.library.repo.BorrowingRecordRepo;
 import com.main.library.service.BorrowingRecordService;
 
@@ -17,7 +16,7 @@ public class BorrowingRecordServiceImpl implements BorrowingRecordService{
 	@Autowired
 	private BorrowingRecordRepo recordRepo;
 	@Override
-	public Optional<BorrowingRecord> findById(BorrowingRecordId id) {
+	public Optional<BorrowingRecord> findById(Long id) {
 		
 		return recordRepo.findById(id);
 	}
@@ -28,7 +27,7 @@ public class BorrowingRecordServiceImpl implements BorrowingRecordService{
 	}
 
 	@Override
-	public void deleteById(BorrowingRecordId id) {
+	public void deleteById(Long id) {
 		recordRepo.deleteById(id);
 	}
 
@@ -50,6 +49,17 @@ public class BorrowingRecordServiceImpl implements BorrowingRecordService{
 	@Override
 	public List<BorrowingRecord> findByPatronId(Long patronId) {
 		return recordRepo.findByPatronId(patronId);
+	}
+
+	@Override
+	public List<BorrowingRecord> findByPatronIdAndBookId(Long patronId, Long bookId) {
+		return recordRepo.findByPatronIdAndBookId(patronId, bookId);
+	}
+
+	@Override
+	public void deleteAll(List<BorrowingRecord> records) {
+		recordRepo.deleteAllInBatch(records);
+		
 	}
 
 }

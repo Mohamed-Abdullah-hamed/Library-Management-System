@@ -2,23 +2,25 @@ package com.main.library.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 
 @Entity
-@IdClass(BorrowingRecordId.class)
 public class BorrowingRecord {
 
 	@Id
-	@MapsId("book")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	@ManyToOne
+	@JsonIgnoreProperties(value = {"borrowingRecords"})
 	private Book book;
-	@Id
-	@MapsId("patron")
 	@ManyToOne
+	@JsonIgnoreProperties(value = {"borrowingRecords"})
 	private Patron patron;
 
 	private LocalDate borrowingDate;
@@ -56,4 +58,13 @@ public class BorrowingRecord {
 		this.returnDate = returnDate;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	
 }

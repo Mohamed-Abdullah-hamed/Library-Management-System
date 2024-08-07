@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.main.library.entity.BorrowingRecord;
 import com.main.library.entity.Patron;
-import com.main.library.service.BorrowingRecordService;
+import com.main.library.exception.CustomException;
 import com.main.library.service.PatronService;
 
 import jakarta.validation.Valid;
@@ -27,8 +26,6 @@ import jakarta.validation.Valid;
 public class PatronRestController {
 	@Autowired
 	private PatronService patronService;
-	@Autowired
-	private BorrowingRecordService recordService;
 
 	@GetMapping("{id}")
 	public ResponseEntity<Patron> findById(@PathVariable Long id) {
@@ -51,11 +48,7 @@ public class PatronRestController {
 	public ResponseEntity<?> deleteById(@PathVariable Long id) {
 		Optional<Patron> patron = patronService.findById(id);
 		if (patron.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-		}
-		List<BorrowingRecord> records = recordService.findByPatronId(id);
-		if (records.size() > 0) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			throw new CustomException("this patron is not found");
 		}
 		patronService.deleteById(id);
 		return ResponseEntity.noContent().build();
@@ -63,12 +56,12 @@ public class PatronRestController {
 
 	@PutMapping("{id}")
 	public ResponseEntity<Patron> updateBook(@RequestBody @Valid Patron patron, @PathVariable Long id) {
-		if (id == null || id.equals(0)) {
+		if (id == null || id == 0) {
 			return ResponseEntity.badRequest().build();
 		}
 		Optional<Patron> b = patronService.findById(id);
 		if (b.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			throw new CustomException("this patron is not found");
 		}
 		patron.setId(id);
 		Patron updatedPatron = patronService.updatePatron(patron);
