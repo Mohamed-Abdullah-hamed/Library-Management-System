@@ -3,12 +3,13 @@ package com.main.library.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.main.library.annotation.ValidIdentityNumber;
 import com.main.library.annotation.ValidMobileNumber;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

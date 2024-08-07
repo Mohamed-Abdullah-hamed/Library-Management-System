@@ -1,7 +1,8 @@
 package com.main.library.exception;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,33 +18,32 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(CustomException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ResponseEntity<String> handleCustomException(CustomException ex) {
+	public ResponseEntity<ExceptionPojo> handleCustomException(CustomException ex) {
 		// Log the exception (optional)
-		return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+		ExceptionPojo exPojo = new ExceptionPojo(Arrays.asList(ex.getMessage()), HttpStatus.BAD_REQUEST.value());
+		return ResponseEntity.badRequest().body(exPojo);
 	}
 
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ResponseEntity<String> handleGenericException(Exception ex) {
+	public ResponseEntity<ExceptionPojo> handleGenericException(Exception ex) {
 		// Log the exception (optional)
-		return new ResponseEntity<>("An unexpected error occurred ->"+"message ->"+ex.getMessage()
-		+"\n getLocalizedMessage ->"+ex.getLocalizedMessage()
-		+"\n getCause ->"+ex.getCause()
-		+"\n getSuppressed ->"+ex.getSuppressed()
-		, HttpStatus.INTERNAL_SERVER_ERROR);
+		ExceptionPojo exPojo = new ExceptionPojo(Arrays.asList("An unexpected error occurred"),
+				HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return ResponseEntity.internalServerError().body(exPojo);
 	}
-	
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-    }
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ResponseEntity<ExceptionPojo> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		List<String> errors = new ArrayList<>();
+		ex.getBindingResult().getAllErrors().forEach((error) -> {
+			String fieldName = ((FieldError) error).getField();
+			String errorMessage = error.getDefaultMessage();
+			errors.add(fieldName + " : " + errorMessage);
+		});
+		ExceptionPojo exPojo = new ExceptionPojo(errors, HttpStatus.BAD_REQUEST.value());
+		return ResponseEntity.badRequest().body(exPojo);
+	}
 }

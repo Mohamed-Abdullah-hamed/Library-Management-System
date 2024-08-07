@@ -1,7 +1,6 @@
 package com.main.library.service.impl;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,30 +10,10 @@ import com.main.library.repo.BorrowingRecordRepo;
 import com.main.library.service.BorrowingRecordService;
 
 @Service
-public class BorrowingRecordServiceImpl implements BorrowingRecordService{
+public class BorrowingRecordServiceImpl implements BorrowingRecordService {
 
 	@Autowired
 	private BorrowingRecordRepo recordRepo;
-	@Override
-	public Optional<BorrowingRecord> findById(Long id) {
-		
-		return recordRepo.findById(id);
-	}
-
-	@Override
-	public List<BorrowingRecord> findAll() {
-		return recordRepo.findAll();
-	}
-
-	@Override
-	public void deleteById(Long id) {
-		recordRepo.deleteById(id);
-	}
-
-	@Override
-	public BorrowingRecord updateBook(BorrowingRecord record) {
-		return recordRepo.save(record);
-	}
 
 	@Override
 	public BorrowingRecord save(BorrowingRecord record) {
@@ -59,7 +38,7 @@ public class BorrowingRecordServiceImpl implements BorrowingRecordService{
 	@Override
 	public void deleteAll(List<BorrowingRecord> records) {
 		recordRepo.deleteAllInBatch(records);
-		
+
 	}
 
 }

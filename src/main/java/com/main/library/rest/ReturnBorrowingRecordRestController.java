@@ -22,7 +22,7 @@ import com.main.library.service.PatronService;
 
 @RestController
 @RequestMapping("api/return")
-public class ReturnBorrowingRecord {
+public class ReturnBorrowingRecordRestController {
 
 	@Autowired
 	private BorrowingRecordService recordService;
