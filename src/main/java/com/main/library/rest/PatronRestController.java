@@ -46,10 +46,7 @@ public class PatronRestController {
 
 	@DeleteMapping("{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Long id) {
-		Optional<Patron> patron = patronService.findById(id);
-		if (patron.isEmpty()) {
-			throw new CustomException("this patron is not found");
-		}
+		
 		patronService.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}
@@ -59,22 +56,9 @@ public class PatronRestController {
 		if (id == null || id == 0) {
 			return ResponseEntity.badRequest().build();
 		}
-		Optional<Patron> b = patronService.findById(id);
-		if (b.isEmpty()) {
-			throw new CustomException("this patron is not found");
-		}
-		patron.setId(id);
-		try {
-			Patron updatedPatron = patronService.updatePatron(patron);
-			return ResponseEntity.ok(updatedPatron);
-		} catch (Exception e) {
-			e.printStackTrace();
-			if(e.getMessage().contains("Duplicate")) {
-				throw new CustomException("the Identity Number or Phone Number Is Present Before ");
-			}
-			return ResponseEntity.badRequest().build();
-		}
-		
+		Patron updatedPatron = patronService.updatePatron(patron, id);
+		return ResponseEntity.ok(updatedPatron);
+
 	}
 
 	@PostMapping
@@ -82,18 +66,10 @@ public class PatronRestController {
 		if (patron.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
-		
-		try {
-			Patron savedBook = patronService.save(patron);
-			return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
-		} catch (Exception e) {
-			e.printStackTrace();
-			if(e.getMessage().contains("Duplicate")) {
-				throw new CustomException("the Identity Number or Phone Number Is Present Before ");
-			}
-			return ResponseEntity.badRequest().build();
-		}	
-		
+
+		Patron savedPatron = patronService.save(patron);
+		return ResponseEntity.status(HttpStatus.CREATED).body(savedPatron);
+
 	}
 
 }

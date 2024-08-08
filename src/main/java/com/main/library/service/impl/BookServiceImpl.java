@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.main.library.entity.Book;
 import com.main.library.entity.BorrowingRecord;
@@ -18,6 +19,7 @@ public class BookServiceImpl implements BookService {
 
 	@Autowired
 	private BookRepo bookRepo;
+	
 	@Autowired
 	private BorrowingRecordService recordService;
 
@@ -32,7 +34,12 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(Long id) {
+		Optional<Book> book = findById(id);
+		if (book.isEmpty()) {
+			throw new CustomException("this Book is not found");
+		}
 		List<BorrowingRecord> records = recordService.findByBookId(id);
 		if (records.size() > 0 && records.get(0).getReturnDate() == null) {
 			throw new CustomException("this Book already Borrowed to " + records.get(0).getPatron().getName());
@@ -44,12 +51,31 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Book updateBook(Book book) {
-		return bookRepo.save(book);
+	@Transactional
+	public Book updateBook(Book book, Long id) {
+		if (id == null || id == 0) {
+			return null;
+		}
+		Optional<Book> b = findById(id);
+		if (b.isEmpty()) {
+			throw new CustomException("this Book is not found");
+		}
+		Book b2 = findByIsbn(book.getIsbn());
+		if (b2 != null && !id.equals(b2.getId())) {
+			throw new CustomException("Duplicate Isbn -> this Isbn is inserted before ");
+		}
+		book.setId(id);
+		Book updatedBook = bookRepo.save(book);
+		return updatedBook;
 	}
 
 	@Override
+	@Transactional
 	public Book save(Book book) {
+		Book b = findByIsbn(book.getIsbn());
+		if(b != null) {
+			throw new CustomException("Duplicate Isbn -> this Isbn is inserted before ");
+		}
 		return bookRepo.save(book);
 	}
 

@@ -15,7 +15,7 @@ import com.main.library.service.BorrowingRecordService;
 import com.main.library.service.PatronService;
 
 @Service
-public class PatronServiceImpl implements PatronService{
+public class PatronServiceImpl implements PatronService {
 
 	@Autowired
 	private PatronRepo patronRepo;
@@ -35,24 +35,52 @@ public class PatronServiceImpl implements PatronService{
 	@Override
 	@Transactional
 	public void deleteById(Long id) {
+		Optional<Patron> patron = findById(id);
+		if (patron.isEmpty()) {
+			throw new CustomException("this patron is not found");
+		}
 		List<BorrowingRecord> records = recordService.findByPatronId(id);
 		if (records.size() > 0 && records.get(0).getReturnDate() == null) {
 			throw new CustomException("this patron already has a book and not return it yet");
 		}
-		if(!records.isEmpty()) {
+		if (!records.isEmpty()) {
 			recordService.deleteAll(records);
-		}	
+		}
 		patronRepo.deleteById(id);
 	}
 
 	@Override
-	public Patron updatePatron(Patron patron) {
-		return patronRepo.save(patron);
+	@Transactional
+	public Patron updatePatron(Patron patron, Long id) {
+		Optional<Patron> b = findById(id);
+		if (b.isEmpty()) {
+			throw new CustomException("this patron is not found");
+		}
+		patron.setId(id);
+		try {
+			Patron updatedPatron = save(patron);
+			return updatedPatron;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (e.getMessage().contains("Duplicate")) {
+				throw new CustomException("the Identity Number or Phone Number Is Present Before ");
+			}
+			throw new RuntimeException();
+		}
 	}
 
 	@Override
 	public Patron save(Patron patron) {
-		return patronRepo.save(patron);
+		try {
+			Patron savedBook = patronRepo.save(patron);
+			return savedBook;
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (e.getMessage().contains("Duplicate")) {
+				throw new CustomException("the Identity Number or Phone Number Is Present Before ");
+			}
+			throw new RuntimeException();
+		}
 	}
 
 }

@@ -10,6 +10,6 @@ public interface PatronService {
 	Optional<Patron> findById(Long id);
 	List<Patron> findAll();
 	void deleteById(Long id);
-	Patron updatePatron(Patron patron);
+	Patron updatePatron(Patron patron,Long id);
 	Patron save(Patron patron);
 }

@@ -40,22 +40,26 @@ public class BookServiceImplTest {
 	}
 
 	@Test
-	void testDeleteBook_Failure() {
+	void testDeleteById_Failure() {
 		BorrowingRecord record = new BorrowingRecord();
 		record.setPatron(new Patron());
 		record.setBook(new Book());
 
 		List<BorrowingRecord> records = Arrays.asList(record);
 		Mockito.when(recordServiceImpl.findByBookId(Mockito.anyLong())).thenReturn(records);
-
+		Mockito.when(bookRepo.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+		Mockito.doNothing().when(bookRepo).deleteById(Mockito.anyLong());
+		
 		assertThrows(CustomException.class, () -> {
 			bookService.deleteById(Mockito.anyLong());
 		});
 	}
 
 	@Test
-	void testDeleteBook_Success() {
+	void testDeleteById_Success() {
 		List<BorrowingRecord> records = new ArrayList<>();
+		Optional<Book> opt = Optional.of(new Book());
+		Mockito.when(bookRepo.findById(Mockito.anyLong())).thenReturn(opt);
 		Mockito.when(recordServiceImpl.findByBookId(Mockito.anyLong())).thenReturn(records);
 		Mockito.doNothing().when(bookRepo).deleteById(Mockito.anyLong());
 		assertDoesNotThrow(() -> {
@@ -64,31 +68,61 @@ public class BookServiceImplTest {
 	}
 
 	@Test
-	void testUpdateBook() {
+	void testUpdateBook_Success() {
 		// Arrange
 		Book book = new Book();
 		book.setId(1L);
+		book.setIsbn("978-3-16-148410-0");
+		Optional<Book> opt = Optional.of(book);
 		Mockito.when(bookRepo.save(Mockito.any(Book.class))).thenReturn(book);
-
+		Mockito.when(bookRepo.findById(Mockito.anyLong())).thenReturn(opt);
+		Mockito.when(bookRepo.findByIsbn("978-3-16-148410-0")).thenReturn(null);
 		// Act
-		Book result = bookService.updateBook(book);
-
+		Book result = bookService.updateBook(book,1L);
 		// Assert
 		assertNotNull(result);
 		assertEquals(1L, result.getId());
 	}
 
 	@Test
-	void testSaveBook() {
+	void testUpdateBook_Failure() {
+		// Arrange
+		Book book = new Book();
+		book.setId(2L);
+		book.setIsbn("978-3-16-148410-0");
+		Optional<Book> opt = Optional.of(book);
+		Mockito.when(bookRepo.save(Mockito.any(Book.class))).thenReturn(book);
+		Mockito.when(bookRepo.findById(Mockito.anyLong())).thenReturn(opt);
+		Mockito.when(bookRepo.findByIsbn("978-3-16-148410-0")).thenReturn(book);
+		assertThrows(CustomException.class, () -> {
+			bookService.updateBook(book,1L);
+		});
+	}
+
+	@Test
+	void testSaveBook_Success() {
 		// Arrange
 		Book book = new Book();
 		book.setId(1L);
+		
 		Mockito.when(bookRepo.save(Mockito.any(Book.class))).thenReturn(book);
 		// Act
 		Book result = bookService.save(book);
 		// Assert
 		assertNotNull(result);
 		assertEquals(1L, result.getId());
+	}
+	@Test
+	void testSaveBook_Failure() {
+		// Arrange
+		Book book = new Book();
+		book.setId(1L);
+		book.setIsbn("978-3-16-148410-0");
+		Mockito.when(bookRepo.findByIsbn("978-3-16-148410-0")).thenReturn(book);
+		Mockito.when(bookRepo.save(Mockito.any(Book.class))).thenReturn(book);
+		assertThrows(CustomException.class, () -> {
+			 bookService.save(book);
+		});
 	}
 
 	@Test

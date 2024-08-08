@@ -52,12 +52,9 @@ public class BookRestControllerTest {
 		book.setIsbn("978-3-16-148410-0");
 		book.setAuthor("abcd");
 		book.setTitle("abcd");
-		Optional<Book> opt = Optional.of(book);
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(book);
-		when(bookService.findById(1L)).thenReturn(opt);
-		when(bookService.findByIsbn(Mockito.anyString())).thenReturn(null);
-		when(bookService.updateBook(Mockito.any())).thenReturn(book);
+		when(bookService.updateBook(book,1L)).thenReturn(book);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/books/1").contentType(MediaType.APPLICATION_JSON).content(json)
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
@@ -75,8 +72,6 @@ public class BookRestControllerTest {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(book);
-		
-		when(bookService.findByIsbn(Mockito.anyString())).thenReturn(null);
 		when(bookService.save(Mockito.any())).thenReturn(book);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/books").contentType(MediaType.APPLICATION_JSON).content(json)
@@ -90,8 +85,6 @@ public class BookRestControllerTest {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(book);
-		
-		when(bookService.findByIsbn(Mockito.anyString())).thenReturn(null);
 		when(bookService.save(Mockito.any())).thenReturn(book);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/books").contentType(MediaType.APPLICATION_JSON).content(json)
@@ -103,40 +96,23 @@ public class BookRestControllerTest {
 
 		Book book = new Book();
 		book.setId(1L);
-		Optional<Book> opt = Optional.of(book);
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(book);
-		when(bookService.findById(1L)).thenReturn(opt);
-		when(bookService.findByIsbn(Mockito.anyString())).thenReturn(null);
-		when(bookService.updateBook(Mockito.any())).thenReturn(book);
-
+	
+		when(bookService.updateBook(book,1L)).thenReturn(book);
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/books/1").contentType(MediaType.APPLICATION_JSON).content(json)
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 	}
 
 	@Test
-	void testDeleteById_Success() throws Exception {
+	void testDeleteById() throws Exception {
 
-		Book book = new Book();
-		book.setId(1L);
-		Optional<Book> opt = Optional.of(book);
-		when(bookService.findById(1L)).thenReturn(opt);
 		doNothing().when(bookService).deleteById(1L);
 
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/books/1").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNoContent());
 	}
 
-	@Test
-	void testDeleteById_Failure() throws Exception {
-
-		Optional<Book> opt = Optional.empty();
-		when(bookService.findById(1L)).thenReturn(opt);
-		doNothing().when(bookService).deleteById(1L);
-
-		mockMvc.perform(MockMvcRequestBuilders.delete("/api/books/1").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isBadRequest());
-	}
 
 	@Test
 	void testFindAll() throws Exception {

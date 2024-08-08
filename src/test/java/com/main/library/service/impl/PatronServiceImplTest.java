@@ -3,7 +3,6 @@ package com.main.library.service.impl;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ public class PatronServiceImplTest {
 
 	@Mock
 	private BorrowingRecordServiceImpl recordServiceImpl;
+
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
@@ -47,37 +47,53 @@ public class PatronServiceImplTest {
 
 		List<BorrowingRecord> records = Arrays.asList(record);
 		Mockito.when(recordServiceImpl.findByPatronId(Mockito.anyLong())).thenReturn(records);
-
-		   assertThrows(CustomException.class, () -> {
-			   patronService.deleteById(Mockito.anyLong());
-	        });
+		Mockito.doNothing().when(patronRepo).deleteById(Mockito.anyLong());
+		
+		assertThrows(CustomException.class, () -> {
+			patronService.deleteById(Mockito.anyLong());
+		});
 	}
-	
+
 	@Test
 	void testDeleteBook_Success() {
 		List<BorrowingRecord> records = new ArrayList<>();
+		Patron patron = new Patron();
+		Mockito.when(patronRepo.findById(1L)).thenReturn(Optional.of(patron));
 		Mockito.when(recordServiceImpl.findByPatronId(Mockito.anyLong())).thenReturn(records);
 		Mockito.doNothing().when(patronRepo).deleteById(Mockito.anyLong());
-		   assertDoesNotThrow(() -> {
-			   patronService.deleteById(Mockito.anyLong());
-	        });
+		assertDoesNotThrow(() -> {
+			patronService.deleteById(1L);
+		});
 	}
-	
+
 	@Test
-	void testUpdatePatron() {
+	void testUpdatePatron_Success() {
 		// Arrange
 		Patron patron = new Patron();
 		patron.setId(1L);
+		Mockito.when(patronRepo.findById(1L)).thenReturn(Optional.of(patron));
 		Mockito.when(patronRepo.save(Mockito.any(Patron.class))).thenReturn(patron);
-
+		
 		// Act
-		Patron result = patronService.updatePatron(patron);
+		Patron result = patronService.updatePatron(patron,1L);
 
 		// Assert
 		assertNotNull(result);
 		assertEquals(1L, result.getId());
 	}
-	
+	@Test
+	void testUpdatePatron_Failure() {
+		// Arrange
+		Patron patron = new Patron();
+		patron.setId(1L);
+		Mockito.when(patronRepo.findById(1L)).thenReturn(Optional.empty());
+		Mockito.when(patronRepo.save(patron)).thenReturn(patron);
+		
+		assertThrows(CustomException.class, () -> {
+			patronService.updatePatron(patron,1L);
+		});
+	}
+
 	@Test
 	void testGetAllPatrons() {
 		// Arrange
@@ -89,7 +105,7 @@ public class PatronServiceImplTest {
 		// Assert
 		assertEquals(1, result.size());
 	}
-	
+
 	@Test
 	void testSavePatron() {
 		// Arrange

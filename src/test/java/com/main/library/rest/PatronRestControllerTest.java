@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -51,12 +50,11 @@ public class PatronRestControllerTest {
 		patron.setIdentityNumber("784-1244-1234567-2");
 		patron.setPhoneNumber("501334562");
 		patron.setName("Mohamed");
-		Optional<Patron> opt = Optional.of(patron);
-	
+
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(patron);
-		when(patronService.findById(1L)).thenReturn(opt);
-		when(patronService.updatePatron(Mockito.any())).thenReturn(patron);
+
+		when(patronService.updatePatron(patron, 1L)).thenReturn(patron);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/patrons/1").contentType(MediaType.APPLICATION_JSON)
 				.content(json).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
@@ -73,7 +71,7 @@ public class PatronRestControllerTest {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(patron);
-		when(patronService.save(Mockito.any())).thenReturn(patron);
+		when(patronService.save(patron)).thenReturn(patron);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/patrons").contentType(MediaType.APPLICATION_JSON)
 				.content(json).accept(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
@@ -88,7 +86,7 @@ public class PatronRestControllerTest {
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(patron);
 
-		when(patronService.save(Mockito.any())).thenReturn(patron);
+		when(patronService.save(patron)).thenReturn(patron);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/patrons").contentType(MediaType.APPLICATION_JSON)
 				.content(json).accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
@@ -99,38 +97,23 @@ public class PatronRestControllerTest {
 
 		Patron patron = new Patron();
 		patron.setId(1L);
-		Optional<Patron> opt = Optional.of(patron);
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(patron);
-		when(patronService.findById(1L)).thenReturn(opt);
-		when(patronService.updatePatron(Mockito.any())).thenReturn(patron);
+		when(patronService.updatePatron(patron, 1L)).thenReturn(patron);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/patrons/1").contentType(MediaType.APPLICATION_JSON)
 				.content(json).accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 	}
 
 	@Test
-	void testDeleteById_Success() throws Exception {
+	void testDeleteById() throws Exception {
 
 		Patron patron = new Patron();
 		patron.setId(1L);
-		Optional<Patron> opt = Optional.of(patron);
-		when(patronService.findById(1L)).thenReturn(opt);
 		doNothing().when(patronService).deleteById(1L);
 
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/patrons/1").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNoContent());
-	}
-
-	@Test
-	void testDeleteById_Failure() throws Exception {
-
-		Optional<Patron> opt = Optional.empty();
-		when(patronService.findById(1L)).thenReturn(opt);
-		doNothing().when(patronService).deleteById(1L);
-
-		mockMvc.perform(MockMvcRequestBuilders.delete("/api/patrons/1").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isBadRequest());
 	}
 
 	@Test

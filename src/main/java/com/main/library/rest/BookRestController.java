@@ -46,30 +46,17 @@ public class BookRestController {
 
 	@DeleteMapping("{id}")
 	public ResponseEntity<?> deleteById(@PathVariable Long id) {
-		Optional<Book> book = bookService.findById(id);
-		if (book.isEmpty()) {
-			throw new CustomException("this Book is not found");
-		}
-
 		bookService.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("{id}")
 	public ResponseEntity<Book> updateBook(@RequestBody @Valid Book book, @PathVariable Long id) {
-		if (id == null || id == 0) {
+
+		Book updatedBook = bookService.updateBook(book,id);
+		if(updatedBook == null) {
 			return ResponseEntity.badRequest().build();
 		}
-		Optional<Book> b = bookService.findById(id);
-		if (b.isEmpty()) {
-			throw new CustomException("this Book is not found");
-		}
-		Book b2 = bookService.findByIsbn(book.getIsbn());
-		if(b2 != null && !id.equals(b2.getId())) {
-			throw new CustomException("Duplicate Isbn -> this Isbn is inserted before ");
-		}
-		book.setId(id);
-		Book updatedBook = bookService.updateBook(book);
 		return ResponseEntity.ok(updatedBook);
 	}
 
@@ -77,10 +64,6 @@ public class BookRestController {
 	public ResponseEntity<Book> save(@RequestBody @Valid Book book) {
 		if (book.getId() != null) {
 			return ResponseEntity.badRequest().build();
-		}
-		Book b = bookService.findByIsbn(book.getIsbn());
-		if(b != null) {
-			throw new CustomException("Duplicate Isbn -> this Isbn is inserted before ");
 		}
 		Book savedBook = bookService.save(book);
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);

@@ -6,8 +6,8 @@ import com.main.library.entity.BorrowingRecord;
 
 public interface BorrowingRecordService {
 
-
-	BorrowingRecord save(BorrowingRecord record);
+	BorrowingRecord update(Long bookId,Long patronId);
+	BorrowingRecord save(Long bookId,Long patronId);
 
 	List<BorrowingRecord> findByBookId(Long bookId);
 
