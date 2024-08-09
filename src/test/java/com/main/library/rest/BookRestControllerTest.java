@@ -11,9 +11,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -22,7 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.library.entity.Book;
 import com.main.library.service.impl.BookServiceImpl;
 
-@WebMvcTest(BookRestController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class BookRestControllerTest {
 
 	@Autowired
@@ -32,6 +35,7 @@ public class BookRestControllerTest {
 	private BookServiceImpl bookService;
 
 	@Test
+	@WithMockUser(username = "testuser", roles = { "USER" })
 	void testFindById() throws Exception {
 
 		Book book = new Book();
@@ -44,6 +48,7 @@ public class BookRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testUpdateBook_Success() throws Exception {
 
 		Book book = new Book();
@@ -54,7 +59,7 @@ public class BookRestControllerTest {
 		book.setTitle("abcd");
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(book);
-		when(bookService.updateBook(book,1L)).thenReturn(book);
+		when(bookService.updateBook(book, 1L)).thenReturn(book);
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/books/1").contentType(MediaType.APPLICATION_JSON).content(json)
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
@@ -62,6 +67,7 @@ public class BookRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testSave_Success() throws Exception {
 
 		Book book = new Book();
@@ -78,7 +84,9 @@ public class BookRestControllerTest {
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.author").value("abcd"));
 	}
+
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testSaveWithUnValidBody() throws Exception {
 
 		Book book = new Book();
@@ -92,19 +100,21 @@ public class BookRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testUpdateBookWithUnValidBody() throws Exception {
 
 		Book book = new Book();
 		book.setId(1L);
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(book);
-	
-		when(bookService.updateBook(book,1L)).thenReturn(book);
+
+		when(bookService.updateBook(book, 1L)).thenReturn(book);
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/books/1").contentType(MediaType.APPLICATION_JSON).content(json)
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testDeleteById() throws Exception {
 
 		doNothing().when(bookService).deleteById(1L);
@@ -113,8 +123,8 @@ public class BookRestControllerTest {
 				.andExpect(status().isNoContent());
 	}
 
-
 	@Test
+	@WithMockUser(username = "testuser", roles = { "USER" })
 	void testFindAll() throws Exception {
 
 		Book book = new Book();

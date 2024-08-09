@@ -26,10 +26,10 @@ public class Book {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotBlank
-	@Length(min = 4)
+	@Length(min = 4,max=50)
 	private String title;
 	@NotBlank
-	@Length(min = 4)
+	@Length(min = 4,max=20)
 	private String author;
 	@YearBeforeCurrentYear
 	@Column(name = "publication_year")

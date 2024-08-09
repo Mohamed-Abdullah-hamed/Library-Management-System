@@ -10,9 +10,11 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -21,7 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.library.entity.Patron;
 import com.main.library.service.impl.PatronServiceImpl;
 
-@WebMvcTest(PatronRestController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class PatronRestControllerTest {
 
 	@Autowired
@@ -31,6 +34,7 @@ public class PatronRestControllerTest {
 	private PatronServiceImpl patronService;
 
 	@Test
+	@WithMockUser(username = "testuser", roles = { "USER" })
 	void testFindById() throws Exception {
 
 		Patron patron = new Patron();
@@ -43,6 +47,7 @@ public class PatronRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testUpdatePatron_Success() throws Exception {
 
 		Patron patron = new Patron();
@@ -62,6 +67,7 @@ public class PatronRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testSave_Success() throws Exception {
 
 		Patron patron = new Patron();
@@ -79,6 +85,7 @@ public class PatronRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testSaveWithUnValidBody() throws Exception {
 
 		Patron patron = new Patron();
@@ -93,6 +100,7 @@ public class PatronRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testUpdatePatronWithUnValidBody() throws Exception {
 
 		Patron patron = new Patron();
@@ -106,6 +114,7 @@ public class PatronRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testadmin", roles = { "ADMIN" })
 	void testDeleteById() throws Exception {
 
 		Patron patron = new Patron();
@@ -117,6 +126,7 @@ public class PatronRestControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testuser", roles = { "USER" })
 	void testFindAll() throws Exception {
 
 		Patron patron = new Patron();

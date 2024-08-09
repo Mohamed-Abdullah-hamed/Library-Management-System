@@ -25,7 +25,7 @@ public class Patron {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotBlank
-	@Length(min = 4)
+	@Length(min = 4,max = 20)
 	private String name;
 	
 	@ValidMobileNumber
