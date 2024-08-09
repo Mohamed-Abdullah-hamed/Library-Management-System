@@ -22,10 +22,10 @@ Database: ensure mysql server is installed and running
    mvn clean install  
    mvn spring-boot:run  
 
-## 4. API Endpoints  
+## 4. API Endpoints Security  
 with all GET API Endpoints I secure them to run with the role USER or role ADMIN so you should use HTTP Basic Authentication with  
-USER ROLE CREDENTIALS{ userName  Mohamed and password  mohamed123 }  
-or with ADMIN ROLE CREDENTIALS { userName  Libarian and password  libarian123}  
+USER ROLE CREDENTIALS{ userName  `Mohamed` and password  `mohamed123` }  
+or with ADMIN ROLE CREDENTIALS { userName  `Libarian` and password  `libarian123`}  
 with all POST or PUT  API Endpoints I secure them to run with role ADMIN only so you should use HTTP Basic Authentication with ADMIN ROLE CREDENTIALS { userName  Libarian and password  libarian123}  
 
 # 4.1. Book Management Endpoints  
