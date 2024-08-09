@@ -58,7 +58,15 @@ with all POST or PUT  API Endpoints I secure them to run with role ADMIN only so
    there are some constraints on borrowing a book  
    as this book must be available now in the library and the patron does not have another book  
   Borrow a Book: POST /api/borrow/{bookId}/patron/{patronId}  
-  Return a Book: PUT /api/return/{bookId}/patron/{patronId}  
+  Return a Book: PUT /api/return/{bookId}/patron/{patronId}    
+
+
+  ## Postman Collection
+
+You can find the Postman collection for the Library Management System API called Library-management-system.postman_collection.json  
+
+
+To use it, download the file and import it into Postman.
 
 
 
